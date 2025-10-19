@@ -1,0 +1,54 @@
+{% extends "movies/base.html" %}
+
+{% block title %}{{ movie.title }}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-4 col-sm-12 text-center mb-4">
+            {% with poster_url='https://image.tmdb.org/t/p/w500'|add:movie.poster_path %}
+                <img src="{{ poster_url }}" class="img-fluid rounded shadow" alt="{{ movie.title }}" style="max-width: 300px;">
+            {% endwith %}
+        </div>
+        
+        <div class="col-md-8 col-sm-12">
+            <h1>{{ movie.title }}</h1>
+            <p class="text-muted fs-5">
+                {% if api_data.release_date %}{{ api_data.release_date|date:"Y" }} | {% endif %}
+                {% if api_data.runtime %}{{ api_data.runtime }} min{% endif %}
+            </p>
+
+            <div class="mb-4">
+                {% if movie.watched %}
+                    <span class="badge bg-success fs-6">✅ VISTA</span>
+                    <a href="{% url 'toggle_watched' movie.pk %}" class="btn btn-sm btn-warning ms-3">Marcar como Pendiente</a>
+                {% else %}
+                    <span class="badge bg-warning text-dark fs-6">⏳ PENDIENTE</span>
+                    <a href="{% url 'toggle_watched' movie.pk %}" class="btn btn-sm btn-success ms-3">Marcar como Vista</a>
+                {% endif %}
+            </div>
+
+            {% if api_data %}
+                <h3 class="mt-4">Sinopsis</h3>
+                <p>{{ api_data.overview|default:"No hay sinopsis disponible." }}</p>
+                
+                <h4 class="mt-4">Información Adicional</h4>
+                <ul class="list-group list-group-flush">
+                    {% if api_data.genres %}
+                        <li class="list-group-item"><strong>Géneros:</strong> {{ api_data.genres|join:", " }}</li>
+                    {% endif %}
+                    {% if api_data.vote_average %}
+                        <li class="list-group-item"><strong>Puntuación TMDb:</strong> <span class="badge bg-info">{{ api_data.vote_average }} / 10</span></li>
+                    {% endif %}
+                </ul>
+            {% else %}
+                <div class="alert alert-danger mt-4">
+                    {{ api_error|default:"No se pudieron cargar los datos adicionales de TMDb." }}
+                </div>
+            {% endif %}
+
+            <div class="mt-5 pt-3 border-top">
+                <a href="{% url 'delete_movie' movie.pk %}" class="btn btn-danger">Eliminar de mi Colección</a>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

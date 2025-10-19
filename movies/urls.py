@@ -26,4 +26,6 @@ urlpatterns = [
     
     # Eliminar una película
     path('<int:pk>/delete/', MovieDeleteView.as_view(), name='delete_movie'),
+
+    path('add/', views.add_movie_from_tmdb, name='add_movie_from_tmdb'),
 ]

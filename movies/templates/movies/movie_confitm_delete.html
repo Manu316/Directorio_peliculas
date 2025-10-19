@@ -1,0 +1,20 @@
+{% extends "movies/base.html" %}
+
+{% block title %}Eliminar Película{% endblock %}
+
+{% block content %}
+    <div class="card shadow-sm mx-auto" style="max-width: 500px;">
+        <div class="card-header bg-danger text-white">
+            Confirmar Eliminación
+        </div>
+        <div class="card-body">
+            <p class="lead">¿Estás seguro de que deseas eliminar la película **"{{ movie.title }}"** de tu colección?</p>
+
+            <form method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger me-2">Sí, Eliminar</button>
+                <a href="{% url 'detail_movie' movie.pk %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+{% endblock content %}

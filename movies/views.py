@@ -3,6 +3,8 @@ from django.views.generic import ListView, DetailView, DeleteView
 from django.urls import reverse_lazy
 from .models import Movie
 import requests
+from django.contrib import messages
+from django.db import IntegrityError
 
 # --- CRUD  ---
 
@@ -88,3 +90,36 @@ def search_movie(request):
             pass
 
     return render(request, 'movies/movie_search.html', {'results': results, 'query': query})
+
+
+def add_movie_from_tmdb(request):
+    if request.method == 'POST':
+        # Extrae los datos enviados por la plantilla de búsqueda
+        tmdb_id = request.POST.get('tmdb_id')
+        title = request.POST.get('title')
+        release_date = request.POST.get('release_date')
+        poster_path = request.POST.get('poster_path')
+
+        # Convierte la fecha vacía a None si no existe
+        if not release_date:
+            release_date = None
+
+        try:
+            # Crea y guarda el objeto Movie
+            movie = Movie.objects.create(
+                tmdb_id=tmdb_id,
+                title=title,
+                release_date=release_date,
+                poster_path=poster_path,
+                watched=False
+            )
+            messages.success(request, f'"{title}" se ha añadido a tu colección.')
+            # Redirige a la página de detalle de la película recién creada
+            return redirect('detail_movie', pk=movie.pk)
+
+        except IntegrityError:
+            messages.error(request, f'"{title}" ya está en tu colección.')
+        except Exception as e:
+            messages.error(request, f'Error al guardar la película: {e}')
+
+    return redirect('search_movie') # Redirige a la búsqueda si no es POST    
