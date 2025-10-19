@@ -2,6 +2,7 @@
 
 from django.urls import path
 from . import views 
+from .views import MovieListView, MovieDetailView, MovieDeleteView
 
 urlpatterns = [
     # Vista de inicio
@@ -11,6 +12,18 @@ urlpatterns = [
     path('search/', views.search_movie, name='search_movie'),
 
     # Rutas
-    path('<int:pk>/', views.MovieDetailView.as_view(), name='detail_movie'),
+    # Vista de Inicio 
+    path('', MovieListView.as_view(), name='list_movies'),
+
+    # Vista de Búsqueda
+    path('search/', views.search_movie, name='search_movie'),
+
+    # Detalle de una película
+    path('<int:pk>/', MovieDetailView.as_view(), name='detail_movie'),
+
+    # Alternar el estado
     path('<int:pk>/watched/', views.toggle_watched, name='toggle_watched'),
+    
+    # Eliminar una película
+    path('<int:pk>/delete/', MovieDeleteView.as_view(), name='delete_movie'),
 ]
