@@ -1,0 +1,41 @@
+/* Fondo casi negro */
+.bg-dark {
+    background-color: #141414 !important;
+}
+
+.bg-black-custom {
+    background-color: #000000 !important;
+    border-bottom: 1px solid #141414;
+}
+
+body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* Quita los bordes de las tarjetas */
+.card {
+    background-color: #141414;
+    border: none;
+    transition: transform 0.2s; 
+}
+
+.card:hover {
+    transform: scale(1.05);
+    z-index: 10;
+}
+
+/* Estilo para los títulos de las películas */
+.card-title {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.btn-primary {
+    background-color: #E50914; /* Rojo Netflix */
+    border-color: #E50914;
+}
+.btn-primary:hover {
+    background-color: #B20710;
+    border-color: #B20710;
+}
