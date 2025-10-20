@@ -8,7 +8,7 @@
             overflow: hidden; 
             text-overflow: ellipsis; 
             display: -webkit-box;
-            -webkit-line-clamp: 3;
+            -webkit-line-clamp: 3; 
             -webkit-box-orient: vertical;
             line-clamp: 3; 
         }
@@ -39,16 +39,25 @@
                         {% endwith %}
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title mb-1">{{ movie_api.title }}</h5>
+                            
                             <p class="card-text text-muted small mb-2">
-                                {{ movie_api.release_date|date:"Y"|default:"Fecha desconocida" }}
+                                {% if movie_api.release_date %}
+                                    {{ movie_api.release_date|date:"Y" }}
+                                {% else %}
+                                    Fecha desconocida
+                                {% endif %}
                             </p>
+                            
                             <p class="card-text small overview-clamp">{{ movie_api.overview }}</p>
                             
                             <form method="POST" action="{% url 'add_movie_from_tmdb' %}" class="mt-auto">
                                 {% csrf_token %}
                                 <input type="hidden" name="tmdb_id" value="{{ movie_api.id }}">
                                 <input type="hidden" name="title" value="{{ movie_api.title }}">
+                                
+                                {# Se envía la fecha original de la API #}
                                 <input type="hidden" name="release_date" value="{{ movie_api.release_date }}">
+                                
                                 <input type="hidden" name="poster_path" value="{{ movie_api.poster_path }}">
                                 
                                 <button type="submit" class="btn btn-success btn-sm w-100">Añadir a mi Colección</button>

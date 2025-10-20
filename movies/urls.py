@@ -2,42 +2,43 @@
 
 from django.urls import path
 from . import views 
-from .views import MovieListView, MovieDetailView, MovieDeleteView
+from .views import (
+    UserCollectionView,
+    MovieDetailView,
+    MovieDeleteView,
+)
 
 urlpatterns = [
-    # Vista de inicio
-    path('', views.MovieListView.as_view(), name='list_movies'),
+    path('', views.tmdb_home_view, name='home'),
 
-    # Vista de búsqueda
+    path('collection/', UserCollectionView.as_view(), name='collection_list'),
+    
+    # Búsqueda
     path('search/', views.search_movie, name='search_movie'),
-
-    # Rutas
-    # Vista de Inicio 
-    path('', MovieListView.as_view(), name='list_movies'),
-
-    # Vista de Búsqueda
-    path('search/', views.search_movie, name='search_movie'),
-
-    # Detalle de una película
-    path('<int:pk>/', MovieDetailView.as_view(), name='detail_movie'),
+    
+    # Detalle de película
+    path('detail/<int:pk>/', MovieDetailView.as_view(), name='detail_movie'),
 
     # Alternar el estado
-    path('<int:pk>/watched/', views.toggle_watched, name='toggle_watched'),
+    path('detail/<int:pk>/watched/', views.toggle_watched, name='toggle_watched'),
     
     # Eliminar una película
-    path('<int:pk>/delete/', MovieDeleteView.as_view(), name='delete_movie'),
+    path('detail/<int:pk>/delete/', MovieDeleteView.as_view(), name='delete_movie'),
 
+    # Añadir desde TMDb
     path('add/', views.add_movie_from_tmdb, name='add_movie_from_tmdb'),
 
-    path('tmdb/<int:tmdb_id>/', views.tmdb_detail, name='tmdb_detail'),  
+    # Detalle de TMDb
+    path('tmdb/<int:tmdb_id>/', views.tmdb_detail, name='tmdb_detail'),
 
-path('peliculas/<slug:category>/', 
-         views.tmdb_category_list, 
+    # Rutas de Categorías
+    path('peliculas/<slug:category>/',
+         views.tmdb_category_list,
          {'media_type': 'movie'},
          name='tmdb_movies_category'),
          
-    path('series/<slug:category>/', 
-         views.tmdb_category_list, 
-         {'media_type': 'tv'}, 
-         name='tmdb_series_category'),      
+    path('series/<slug:category>/',
+         views.tmdb_category_list,
+         {'media_type': 'tv'},
+         name='tmdb_series_category'),
 ]

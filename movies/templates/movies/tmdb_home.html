@@ -1,0 +1,35 @@
+{% extends "movies/base.html" %}
+{% load static %}
+{% load custom_filters %} 
+
+{% block title %}Inicio - Explorar TMDb{% endblock %}
+
+{% block content %}
+
+    <div class="row justify-content-center mb-5 mt-5 p-5 bg-dark-gradient border-bottom border-danger">
+        {# ... (El código de la barra de búsqueda va aquí, si quieres mantenerla en el inicio) ... #}
+    </div>
+
+    {% if popular_movies %}
+        <h2 class="text-white mb-3">Películas Populares</h2>
+        <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-3 g-lg-4 mb-5">
+            {% for movie in popular_movies %}
+                {% include 'movies/_movie_card.html' with movie=movie is_local_collection=False %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if now_playing_movies %}
+        <h2 class="text-white mb-3">En Cartelera</h2>
+        <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-3 g-lg-4 mb-5">
+            {% for movie in now_playing_movies %}
+                {% include 'movies/_movie_card.html' with movie=movie is_local_collection=False %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if api_error %}
+        <div class="alert alert-danger bg-dark-alert border-danger">{{ api_error }}</div>
+    {% endif %}
+
+{% endblock content %}

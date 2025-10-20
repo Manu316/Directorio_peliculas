@@ -7,42 +7,35 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import DeleteView
 from django.contrib import messages
-from .models import Movie # Asume que tu modelo se llama Movie
+from .models import Movie 
 
-# -------------------------------------------------------------
-# VISTAS CRUD (Colección Local)
-# -------------------------------------------------------------
-
-# Vista principal: Muestra la colección local + Listas públicas de TMDb
-class MovieListView(ListView):
-    model = Movie
-    template_name = 'movies/movie_list.html'
-    context_object_name = 'movies'
+def tmdb_home_view(request):
+    context = {}
     
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    try:
+        api_key = settings.TMDB_API_KEY 
         
-        try:
-            # 🎯 Usa la clave API de settings
-            api_key = settings.TMDB_API_KEY 
-            
-            # 1. Obtener películas Populares de TMDb
-            url_popular = f"https://api.themoviedb.org/3/movie/popular?api_key={api_key}&language=es-ES&page=1"
-            response_popular = requests.get(url_popular).json()
-            context['popular_movies'] = response_popular.get('results', [])
-            
-            # 2. Obtener películas en Cartelera de TMDb
-            url_now_playing = f"https://api.themoviedb.org/3/movie/now_playing?api_key={api_key}&language=es-ES&page=1"
-            response_now_playing = requests.get(url_now_playing).json()
-            context['now_playing_movies'] = response_now_playing.get('results', [])
-            
-        except Exception as e:
-            context['api_error'] = "No se pudieron cargar las listas de TMDb. Verifica tu API Key o conexión."
-            
-        # context['movies'] contiene la lista de películas locales (get_queryset por defecto)
-        return context
+        # Obtener películas Populares
+        url_popular = f"https://api.themoviedb.org/3/movie/popular?api_key={api_key}&language=es-ES&page=1"
+        response_popular = requests.get(url_popular).json()
+        context['popular_movies'] = response_popular.get('results', [])
+        
+        # Obtener películas en Cartelera
+        url_now_playing = f"https://api.themoviedb.org/3/movie/now_playing?api_key={api_key}&language=es-ES&page=1"
+        response_now_playing = requests.get(url_now_playing).json()
+        context['now_playing_movies'] = response_now_playing.get('results', [])
+        
+    except Exception as e:
+        context['api_error'] = "No se pudieron cargar las listas de TMDb. Verifica tu API Key o conexión."
+        
+    return render(request, 'movies/tmdb_home.html', context)
 
-# Vista de Detalle: Muestra detalles de una película de la colección local + datos extendidos de la API
+class UserCollectionView(ListView):
+    model = Movie
+    template_name = 'movies/movie_list.html' 
+    context_object_name = 'movies'
+
+# Vista de Detalle
 class MovieDetailView(DetailView):
     model = Movie
     template_name = 'movies/movie_detail.html'
@@ -54,7 +47,6 @@ class MovieDetailView(DetailView):
         
         try:
             api_key = settings.TMDB_API_KEY
-            # Consulta la API por el ID de TMDb
             url = f"https://api.themoviedb.org/3/movie/{movie.tmdb_id}?api_key={api_key}&language=es-ES"
             response = requests.get(url).json()
             context['api_data'] = response
@@ -66,7 +58,7 @@ class MovieDetailView(DetailView):
 # Eliminar Película
 class MovieDeleteView(DeleteView):
     model = Movie
-    success_url = reverse_lazy('list_movies') 
+    success_url = reverse_lazy('collection_list') 
     template_name = 'movies/movie_confirm_delete.html'
 
 # Alternar estado Visto/Pendiente
@@ -77,12 +69,7 @@ def toggle_watched(request, pk):
     messages.success(request, f"El estado de '{movie.title}' ha sido actualizado.")
     return redirect('detail_movie', pk=pk)
 
-
-# -------------------------------------------------------------
-# VISTAS DE INTEGRACIÓN CON TMDB
-# -------------------------------------------------------------
-
-# Buscar Películas en TMDb
+# Buscar Películas
 def search_movie(request):
     query = request.GET.get('q')
     results = []
@@ -98,21 +85,23 @@ def search_movie(request):
 
     return render(request, 'movies/movie_search.html', {'results': results, 'query': query})
 
-# Añadir película desde la búsqueda de TMDb a la colección local
+# Añadir película
 def add_movie_from_tmdb(request):
     if request.method == 'POST':
         tmdb_id = request.POST.get('tmdb_id')
         title = request.POST.get('title')
+        
         release_date = request.POST.get('release_date')
+        if not release_date: 
+            release_date = None
+            
         poster_path = request.POST.get('poster_path')
 
         if tmdb_id:
-            # 1. Verificar si ya existe en la colección local
             if Movie.objects.filter(tmdb_id=tmdb_id).exists():
                 messages.warning(request, f"'{title}' ya está en tu colección.")
-                return redirect('list_movies') 
+                return redirect('collection_list') 
 
-            # 2. Crear nueva instancia
             try:
                 Movie.objects.create(
                     tmdb_id=tmdb_id,
@@ -125,31 +114,29 @@ def add_movie_from_tmdb(request):
             except Exception as e:
                 messages.error(request, f"No se pudo guardar la película: {e}")
 
-        return redirect('list_movies')
+        return redirect('collection_list')
     
     messages.error(request, "Método no permitido.")
-    return redirect('list_movies')
+    return redirect('collection_list')
 
+# Detalle de TMDb
 def tmdb_detail(request, tmdb_id):
     api_key = settings.TMDB_API_KEY
     try:
-        # 1. Obtener datos de la película de TMDb
         url = f"https://api.themoviedb.org/3/movie/{tmdb_id}?api_key={api_key}&language=es-ES"
         response = requests.get(url).json()
         
-        # 2. Verificar si la película ya está en la colección
         is_in_collection = Movie.objects.filter(tmdb_id=tmdb_id).exists()
 
         context = {
             'api_data': response,
             'is_in_collection': is_in_collection
         }
-        
     except Exception as e:
         context = {'error': f"Error al cargar el detalle de TMDb: {e}"}
 
-    return render(request, 'movies/tmdb_detail.html', context)    
-
+    return render(request, 'movies/tmdb_detail.html', context) 
+    
 def tmdb_category_list(request, media_type, category):
     api_key = settings.TMDB_API_KEY
     context = {}
@@ -178,4 +165,4 @@ def tmdb_category_list(request, media_type, category):
     else:
         context['api_error'] = f"Categoría '{category}' no encontrada."
 
-    return render(request, 'movies/tmdb_category_list.html', context)    
+    return render(request, 'movies/tmdb_category_list.html', context)

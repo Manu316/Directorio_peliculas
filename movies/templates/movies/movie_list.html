@@ -2,17 +2,13 @@
 {% load static %}
 {% load custom_filters %} 
 
-{% block title %}Explorar Películas{% endblock %}
+{% block title %}Mi Colección{% endblock %}
 
 {% block content %}
 
-    <div class="row justify-content-center mb-5 mt-5 p-5 bg-dark-gradient border-bottom border-danger">
-        {# ... (El código de la barra de búsqueda va aquí) ... #}
-    </div>
-    
+    <h1 class="text-white mb-4 mt-2">Mi Colección Guardada</h1>
     
     {% if movies %}
-        <h2 class="text-white mb-3">Tu Colección Guardada</h2>
         <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-3 g-lg-4 mb-5">
             {% for movie in movies %}
                 {% include 'movies/_movie_card.html' with movie=movie is_local_collection=True %}
@@ -20,31 +16,13 @@
         </div>
     {% else %}
         <div class="alert alert-info bg-dark-alert">
-            Aún no tienes películas en tu colección. ¡Explora las listas de abajo!
+            Aún no tienes películas en tu colección. ¡Explora las películas populares en la página de inicio!
         </div>
     {% endif %}
     
-
-    {% if popular_movies %}
-        <h2 class="text-white mb-3">Películas Populares</h2>
-        <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-3 g-lg-4 mb-5">
-            {% for movie in popular_movies %}
-                {% include 'movies/_movie_card.html' with movie=movie is_local_collection=False %}
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    {% if now_playing_movies %}
-        <h2 class="text-white mb-3">En Cartelera</h2>
-        <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-3 g-lg-4 mb-5">
-            {% for movie in now_playing_movies %}
-                {% include 'movies/_movie_card.html' with movie=movie is_local_collection=False %}
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    {% if api_error %}
-        <div class="alert alert-danger bg-dark-alert border-danger">{{ api_error }}</div>
-    {% endif %}
+    {# ---------------------------------------------------------------------- #}
+    {# LISTAS DE TMDB (popular_movies, now_playing_movies) HAN SIDO ELIMINADAS #}
+    {# ---------------------------------------------------------------------- #}
+    
 
 {% endblock content %}
