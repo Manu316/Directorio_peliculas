@@ -1,0 +1,1 @@
+web: gunicorn Directorio_peliculas.wsgi:application
