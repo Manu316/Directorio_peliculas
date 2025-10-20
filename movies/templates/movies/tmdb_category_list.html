@@ -1,0 +1,24 @@
+{% extends "movies/base.html" %}
+
+{% block title %}{{ category_name }} | {{ media_type|title }}{% endblock %}
+
+{% block content %}
+    
+    <h1 class="text-white mt-4">{{ category_name }}</h1>
+    <hr class="border-danger mb-4">
+
+    {% if api_error %}
+        <div class="alert alert-danger">{{ api_error }}</div>
+    {% elif media_list %}
+        <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-4">
+            {% for media in media_list %}
+                {% with movie=media is_local_collection=False %}
+                    {% include "movies/_movie_card.html" %} 
+                {% endwith %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-white-50">No se encontraron resultados para esta categoría.</p>
+    {% endif %}
+
+{% endblock content %}

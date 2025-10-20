@@ -3,6 +3,17 @@
 {% block title %}Buscar en TMDb{% endblock %}
 
 {% block content %}
+    <style>
+        .overview-clamp {
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            line-clamp: 3; 
+        }
+    </style> 
+
     <h1>Buscar Películas</h1>
     <p class="lead">Busca el título en la base de datos de películas y añádelo a tu colección.</p>
 
@@ -31,7 +42,7 @@
                             <p class="card-text text-muted small mb-2">
                                 {{ movie_api.release_date|date:"Y"|default:"Fecha desconocida" }}
                             </p>
-                            <p class="card-text small text-truncate">{{ movie_api.overview }}</p>
+                            <p class="card-text small overview-clamp">{{ movie_api.overview }}</p>
                             
                             <form method="POST" action="{% url 'add_movie_from_tmdb' %}" class="mt-auto">
                                 {% csrf_token %}

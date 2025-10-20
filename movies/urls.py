@@ -28,4 +28,16 @@ urlpatterns = [
     path('<int:pk>/delete/', MovieDeleteView.as_view(), name='delete_movie'),
 
     path('add/', views.add_movie_from_tmdb, name='add_movie_from_tmdb'),
+
+    path('tmdb/<int:tmdb_id>/', views.tmdb_detail, name='tmdb_detail'),  
+
+path('peliculas/<slug:category>/', 
+         views.tmdb_category_list, 
+         {'media_type': 'movie'},
+         name='tmdb_movies_category'),
+         
+    path('series/<slug:category>/', 
+         views.tmdb_category_list, 
+         {'media_type': 'tv'}, 
+         name='tmdb_series_category'),      
 ]

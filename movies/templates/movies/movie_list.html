@@ -1,38 +1,50 @@
 {% extends "movies/base.html" %}
+{% load static %}
+{% load custom_filters %} 
 
-{% block title %}Mi Colección{% endblock %}
+{% block title %}Explorar Películas{% endblock %}
 
 {% block content %}
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="text-white">Mi Colección</h1> 
-        <a href="{% url 'search_movie' %}" class="btn btn-primary">Añadir Película</a>
-    </div>
 
+    <div class="row justify-content-center mb-5 mt-5 p-5 bg-dark-gradient border-bottom border-danger">
+        {# ... (El código de la barra de búsqueda va aquí) ... #}
+    </div>
+    
+    
     {% if movies %}
-        <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-3 g-lg-4"> 
+        <h2 class="text-white mb-3">Tu Colección Guardada</h2>
+        <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-3 g-lg-4 mb-5">
             {% for movie in movies %}
-                <div class="col">
-                    <a href="{% url 'detail_movie' movie.pk %}" class="text-decoration-none">
-                        <div class="card h-100 shadow-sm">
-                            {% with poster_url='https://image.tmdb.org/t/p/w500'|add:movie.poster_path %}
-                                <img src="{{ poster_url }}" class="card-img-top rounded" alt="{{ movie.title }}" style="height: auto; width: 100%; object-fit: cover;">
-                            {% endwith %}
-                            
-                            <div class="card-body p-2">
-                                <h5 class="card-title text-truncate mb-1">{{ movie.title }}</h5> 
-                                
-                                {% if movie.watched %}
-                                    <span class="badge bg-danger">VISTA</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">PENDIENTE</span>
-                                {% endif %}
-                                
-                            </div>
-                        </div>
-                    </a>
-                </div>
+                {% include 'movies/_movie_card.html' with movie=movie is_local_collection=True %}
             {% endfor %}
         </div>
     {% else %}
-        {% endif %}
+        <div class="alert alert-info bg-dark-alert">
+            Aún no tienes películas en tu colección. ¡Explora las listas de abajo!
+        </div>
+    {% endif %}
+    
+
+    {% if popular_movies %}
+        <h2 class="text-white mb-3">Películas Populares</h2>
+        <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-3 g-lg-4 mb-5">
+            {% for movie in popular_movies %}
+                {% include 'movies/_movie_card.html' with movie=movie is_local_collection=False %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if now_playing_movies %}
+        <h2 class="text-white mb-3">En Cartelera</h2>
+        <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-3 g-lg-4 mb-5">
+            {% for movie in now_playing_movies %}
+                {% include 'movies/_movie_card.html' with movie=movie is_local_collection=False %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if api_error %}
+        <div class="alert alert-danger bg-dark-alert border-danger">{{ api_error }}</div>
+    {% endif %}
+
 {% endblock content %}

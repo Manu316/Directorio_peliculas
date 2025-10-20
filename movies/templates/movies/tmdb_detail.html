@@ -1,0 +1,69 @@
+{% extends "movies/base.html" %}
+
+{% block title %}Detalle TMDb: {{ api_data.title }}{% endblock %}
+
+{% block content %}
+    
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% else %}
+        <div class="row mt-4">
+            <div class="col-md-4 mb-4">
+                {% with poster_url='https://image.tmdb.org/t/p/w500'|add:api_data.poster_path %}
+                    <img src="{{ poster_url }}" class="img-fluid rounded shadow" alt="{{ api_data.title }}">
+                {% endwith %}
+                
+                <div class="d-grid gap-2 mt-3">
+                    {% if is_in_collection %}
+                        <button class="btn btn-secondary btn-lg" disabled>Ya en mi Colección</button>
+                    {% else %}
+                        <form method="POST" action="{% url 'add_movie_from_tmdb' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="tmdb_id" value="{{ api_data.id }}">
+                            <input type="hidden" name="title" value="{{ api_data.title }}">
+                            <input type="hidden" name="release_date" value="{{ api_data.release_date }}">
+                            <input type="hidden" name="poster_path" value="{{ api_data.poster_path }}">
+                            <button type="submit" class="btn btn-danger btn-lg w-100">
+                                Añadir a mi Colección
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <h1 class="display-5 text-white">{{ api_data.title }}</h1>
+                <p class="text-white-50 fs-5">
+                    {% if api_data.release_date %}{{ api_data.release_date|slice:":4" }}{% endif %}
+                </p>
+
+                <hr class="text-white-50">
+
+                <h3 class="text-white">Sinopsis</h3>
+                <p class="lead text-white-75">{{ api_data.overview }}</p>
+
+                <hr class="text-white-50">
+
+                <h3 class="mt-4 text-white">Información Adicional</h3>
+                <ul class="list-group list-group-flush bg-dark border-secondary">
+                    {% if api_data.genres %}
+                        <li class="list-group-item bg-dark text-white border-secondary">
+                            <strong>Géneros:</strong> 
+                            {% for genre in api_data.genres %}
+                                <span class="badge bg-secondary me-1">{{ genre.name }}</span>
+                            {% endfor %}
+                        </li>
+                    {% endif %}
+                    
+                    {% if api_data.vote_average %}
+                        <li class="list-group-item bg-dark text-white border-secondary">
+                            <strong>Puntuación TMDb:</strong> 
+                            <span class="badge bg-info">{{ api_data.vote_average|floatformat:1 }} / 10</span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock content %}

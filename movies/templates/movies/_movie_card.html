@@ -1,0 +1,37 @@
+{% load custom_filters %}
+
+{% comment %} 
+    Esta plantilla dibuja una sola tarjeta de película.
+    Recibe las variables 'movie' y 'is_local_collection'.
+{% endcomment %}
+
+<div class="col">
+    {% if is_local_collection %}
+        <a href="{% url 'detail_movie' movie.pk %}" class="text-decoration-none">
+    {% else %}
+        <a href="{% url 'tmdb_detail' movie.id %}" class="text-decoration-none">
+    {% endif %}
+    
+        <div class="card h-100 bg-dark-custom text-white border-0 shadow-sm transition-scale">
+            
+            {% with poster_url='https://image.tmdb.org/t/p/w500'|add:movie.poster_path %}
+                <img src="{{ poster_url }}" class="card-img-top rounded" alt="{{ movie.title }}" style="height: auto; width: 100%; object-fit: cover;">
+            {% endwith %}
+            
+            <div class="card-body p-2">
+                <h5 class="card-title text-truncate mb-1">{{ movie.title }}</h5>
+                <p class="card-text small text-white-50">
+                    
+                    {% if movie.release_date and movie.release_date|length > 3 %}
+                        {{ movie.release_date|slice:":4" }}
+                    {% endif %}
+
+                    {% if is_local_collection and movie.watched %}
+                        <span class="badge bg-danger ms-2">VISTA</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        
+    </a> 
+</div>

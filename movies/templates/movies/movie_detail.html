@@ -12,7 +12,7 @@
         
         <div class="col-md-8 col-sm-12">
             <h1>{{ movie.title }}</h1>
-            <p class="text-muted fs-5">
+            <p class="text-white fs-5">
                 {% if api_data.release_date %}{{ api_data.release_date|date:"Y" }} | {% endif %}
                 {% if api_data.runtime %}{{ api_data.runtime }} min{% endif %}
             </p>
