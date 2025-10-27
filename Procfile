@@ -1,1 +1,1 @@
-web: gunicorn Directorio_peliculas.wsgi:application
+web: gunicorn config.wsgi:application
