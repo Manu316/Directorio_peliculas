@@ -74,6 +74,10 @@ def search_movie(request):
     query = request.GET.get('q')
     results = []
     
+    existing_tmdb_ids = Movie.objects.values_list('tmdb_id', flat=True)
+
+    existing_tmdb_ids_list = [str(tmdb_id) for tmdb_id in existing_tmdb_ids]
+    
     if query:
         try:
             api_key = settings.TMDB_API_KEY
@@ -82,6 +86,12 @@ def search_movie(request):
             results = response.get('results', [])
         except Exception as e:
             messages.error(request, "Error al conectar con TMDb.")
+
+    context = {
+        'results': results, 
+        'query': query,
+        'existing_tmdb_ids': existing_tmdb_ids_list,
+    }
 
     return render(request, 'movies/movie_search.html', {'results': results, 'query': query})
 
@@ -125,15 +135,18 @@ def tmdb_detail(request, tmdb_id):
     try:
         url = f"https://api.themoviedb.org/3/movie/{tmdb_id}?api_key={api_key}&language=es-ES"
         response = requests.get(url).json()
+
+        imdb_id = response.get('imdb_id')
         
         is_in_collection = Movie.objects.filter(tmdb_id=tmdb_id).exists()
 
         context = {
             'api_data': response,
-            'is_in_collection': is_in_collection
+            'is_in_collection': is_in_collection,
+            'imdb_id': imdb_id
         }
     except Exception as e:
-        context = {'error': f"Error al cargar el detalle de TMDb: {e}"}
+        context = {'error': f"Error al cargar el detalle de TMDb: {e}", 'imdb_id': None}
 
     return render(request, 'movies/tmdb_detail.html', context) 
     
@@ -166,3 +179,18 @@ def tmdb_category_list(request, media_type, category):
         context['api_error'] = f"Categoría '{category}' no encontrada."
 
     return render(request, 'movies/tmdb_category_list.html', context)
+
+# Reproductor de Películas
+def movie_player_view(request, imdb_id):
+    
+    embed_url = f'https://vidlink.pro/movie/{imdb_id}'
+    
+    title = request.GET.get('title', 'Reproductor de Película')
+    
+    context = {
+        'imdb_id': imdb_id,
+        'embed_url': embed_url,
+        'title': title, 
+    }
+    
+    return render(request, 'movies/movie_player.html', context)    

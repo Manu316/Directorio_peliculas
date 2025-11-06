@@ -1,10 +1,5 @@
 {% load custom_filters %}
 
-{% comment %} 
-    Esta plantilla dibuja una sola tarjeta de película.
-    Recibe las variables 'movie' y 'is_local_collection'.
-{% endcomment %}
-
 <div class="col">
     {% if is_local_collection %}
         <a href="{% url 'detail_movie' movie.pk %}" class="text-decoration-none">

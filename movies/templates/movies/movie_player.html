@@ -1,0 +1,24 @@
+{% extends "movies/base.html" %}
+
+{% block title %}Reproduciendo: {{ title|default:"Película" }}{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        
+        <h1 class="text-white mb-4">{{ title|default:"Reproductor de Película" }}</h1>
+        
+        <a href="javascript:history.back()" class="btn btn-secondary mb-3">
+            ← Volver al Detalle
+        </a>
+        
+        <div class="ratio ratio-16x9 shadow-lg rounded-3 bg-dark">
+            <iframe 
+                src="{{ embed_url }}" 
+                title="{{ title|default:'Reproductor' }}"
+                allowfullscreen 
+                frameborder="0"
+            ></iframe>
+        </div>
+        
+    </div>
+{% endblock content %}

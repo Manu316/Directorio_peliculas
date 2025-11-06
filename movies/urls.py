@@ -41,4 +41,7 @@ urlpatterns = [
          views.tmdb_category_list,
          {'media_type': 'tv'},
          name='tmdb_series_category'),
+
+    path('play/<str:imdb_id>/', views.movie_player_view, name='movie_player'),
+         
 ]

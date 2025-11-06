@@ -27,7 +27,14 @@
                                 Añadir a mi Colección
                             </button>
                         </form>
+
                     {% endif %}
+                    <a 
+                        href="{% url 'movie_player' imdb_id=imdb_id %}?title={{ api_data.title|urlencode }}" 
+                        class="btn btn-primary btn-lg w-100 mt-2"
+                    >
+                        ▶️ Mirar película
+                    </a>
                 </div>
             </div>
 
